@@ -1,0 +1,99 @@
+***************************************************************************************************************
+Linux-Bridge & VLAN to isolate tenant traffic
+
+This method represents the "old" way of segregating tenant traffic – prior to the use of GRE/VXLAN tunnels
+
+2 nodes required
+****************************************************************************************************************
+
+# On node1
+
+# Create network namepsace for both companies
+ip netns add mcdonalds
+ip netns add burgerking
+
+# Create veth pair for both companies
+ip link add mdveth0 type veth peer name mdveth1
+ip link add bkveth0 type veth peer name bkveth1
+
+# Add veth1 to each company's namespace
+ip link set mdveth1 netns mcdonalds
+ip link set bkveth1 netns burgerking
+
+# Add same ip to veth1 in both company's namespace 
+ip netns exec mcdonalds ifconfig mdveth1 10.0.0.5/24 up
+ip netns exec burgerking ifconfig bkveth1 10.0.0.5/24 up
+
+# Create a linux bridges for each company
+brctl addbr br-md
+brctl addbr br-bk
+
+# Add veth pair to each company's linux bridge
+brctl addif br-md mdveth0
+brctl addif br-bk bkveth0
+
+# Create vlan interface for each company (mcdonalds=10, burgerking=20)
+ip link add link eth1 name eth1.10 type vlan id 10
+ip link add link eth1 name eth1.20 type vlan id 20
+
+# Add vlan interface to each company's bridge
+brctl addif br-md eth1.10
+brctl addif br-bk eth1.20
+
+# Bring up the vlan interfaces
+ip link set dev eth0.10 up
+ip link set dev eth0.20 up
+
+# Bring up the bridges
+ip link set dev br-md up
+ip link set dev br-bk up
+
+# Bring up both veth0's
+ip link set mdveth0 up
+ip link set mdveth0 up
+
+# On node#2
+
+# Create network namepsace for both companies
+ip netns add mcdonalds
+ip netns add burgerking
+
+# Create veth pair for both companies
+ip link add mdveth0 type veth peer name mdveth1
+ip link add bkveth0 type veth peer name bkveth1
+
+# Add veth1 to each company's namespace
+ip link set mdveth1 netns mcdonalds
+ip link set bkveth1 netns burgerking
+
+# Add same ip to veth1 in both company's namespace 
+ip netns exec mcdonalds ifconfig mdveth1 10.0.0.6/24 up
+ip netns exec burgerking ifconfig bkveth1 10.0.0.6/24 up
+
+# Create a linux-bridge for each company
+brctl addbr br-md
+brctl addbr br-bk
+
+# Add veth pair to each company's linux-bridge
+brctl addif br-md mdveth0
+brctl addif br-bk bkveth0
+
+# Create vlan interface for each company (mcdonalds=10, burgerking=20)
+ip link add link eth1 name eth1.10 type vlan id 10
+ip link add link eth1 name eth1.20 type vlan id 20
+
+# Add vlan interface to each company's bridge
+brctl addif br-md eth1.10
+brctl addif br-bk eth1.20
+
+# Bring up the vlan interfaces
+ip link set dev eth1.10 up
+ip link set dev eth1.20 up
+
+# Bring up the bridges
+ip link set dev br-md up
+ip link set dev br-bk up
+
+# Bring up both veth0's
+ip link set mdveth0 up
+ip link set mdveth0 up
