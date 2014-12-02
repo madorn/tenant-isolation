@@ -41,8 +41,8 @@ brctl addif br-md eth1.10
 brctl addif br-bk eth1.20
 
 # Bring up the vlan interfaces
-ip link set dev eth0.10 up
-ip link set dev eth0.20 up
+ip link set dev eth1.10 up
+ip link set dev eth1.20 up
 
 # Bring up the bridges
 ip link set dev br-md up
@@ -50,7 +50,7 @@ ip link set dev br-bk up
 
 # Bring up both veth0's
 ip link set mdveth0 up
-ip link set mdveth0 up
+ip link set bkveth0 up
 
 # On node#2
 
@@ -96,4 +96,4 @@ ip link set dev br-bk up
 
 # Bring up both veth0's
 ip link set mdveth0 up
-ip link set mdveth0 up
+ip link set bkveth0 up
