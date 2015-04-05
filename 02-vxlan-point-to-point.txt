@@ -33,8 +33,8 @@ brctl addif br-md mdveth0
 brctl addif br-bk bkveth0
 
 # Create a point-to-point VXLAN interface for each company:
-ip link add vxlan-10 type vxlan id 10 remote 10.0.2.8 dev eth0
-ip link add vxlan-20 type vxlan id 20 remote 10.0.2.8 dev eth0
+ip link add vxlan-10 type vxlan id 10 remote 10.0.2.8 dev eth1
+ip link add vxlan-20 type vxlan id 20 remote 10.0.2.8 dev eth1
 			
 # Use the -d flag with ip link to show the VTEP (eth1) linked to the VXLAN interface:
 ip -d link show vxlan-10
