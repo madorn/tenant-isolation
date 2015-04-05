@@ -6,25 +6,83 @@ This method will only support two nodes
 2 nodes required
 ****************************************************************************************************************
 
-# On node1
+Node1
+******
 
-# Create network namepsace for both companies
+# Create a network namespace for both companies
 ip netns add mcdonalds
 ip netns add burgerking
 
-# Create veth pair for both companies
+# Create veth pairs for both companies
 ip link add mdveth0 type veth peer name mdveth1
 ip link add bkveth0 type veth peer name bkveth1
 
-# Add veth1 to each company's namespace
+# Add veth1 to each company's namespace:
 ip link set mdveth1 netns mcdonalds
 ip link set bkveth1 netns burgerking
 
-# Add same ip to veth1 in both company's namespace 
-ip netns exec mcdonalds ifconfig mdveth1 10.0.0.5/24 up
-ip netns exec burgerking ifconfig bkveth1 10.0.0.5/24 up
+# Add the same ip to veth1 in both company namespaces
+ip netns exec mcdonalds ip a add dev mdveth1 10.1.0.5/24
+ip netns exec burgerking ip a add dev bkveth1 10.1.0.5/24
 
-# Create a tenant-network linux-bridge for each company
+# Create a tenant-network linux bridge for each company
+brctl addbr br-md
+brctl addbr br-bk
+
+# Add a veth pair to each company's linux bridge:
+brctl addif br-md mdveth0
+brctl addif br-bk bkveth0
+
+# Create a point-to-point VXLAN interface for each company:
+ip link add vxlan-10 type vxlan id 10 remote 10.0.2.8 dev eth0
+ip link add vxlan-20 type vxlan id 20 remote 10.0.2.8 dev eth0
+			
+# Use the -d flag with ip link to show the VTEP (eth1) linked to the VXLAN interface:
+ip -d link show vxlan-10
+ip -d link show vxlan-20
+
+# Add the point-to-point VXLAN interface to each company's tenant-network Linux bridge:
+brctl addif br-md vxlan-10
+brctl addif br-bk vxlan-20
+
+# Bring up the veth pairs:
+ip link set dev mdveth0 up
+ip link set dev bkveth0 up
+ip netns exec mcdonalds ip link set dev mdveth1 up
+ip netns exec burgerking ip link set dev bkveth1 up
+
+# Bring up the loopback adapter inside the namespaces:
+ip netns exec mcdonalds ip link set dev lo up
+ip netns exec burgerking ip link set dev lo up
+
+# Bring up each company's tenant-network bridge:
+ip link set dev br-md up
+ip link set dev br-bk up
+
+# Bring up the VXLAN interface for each company:
+ip link set dev vxlan-10 up
+ip link set dev vxlan-20 up
+
+Node2
+******
+
+# Create network namespace for both companies:
+ip netns add mcdonalds
+ip netns add burgerking
+
+# Create veth pair for both companies:
+ip link add mdveth0 type veth peer name mdveth1
+ip link add bkveth0 type veth peer name bkveth1
+
+# Add veth1 to each company's namespace:
+ip link set mdveth1 netns mcdonalds
+ip link set bkveth1 netns burgerking
+
+# Add same ip to veth1 in both company's namespace:
+ip netns exec mcdonalds ip a add dev mdveth1 10.1.0.6/24
+ip netns exec burgerking ip a add dev bkveth1 10.1.0.6/24
+
+# Create a tenant-network linux-bridge for each company:
 brctl addbr br-md
 brctl addbr br-bk
 
@@ -32,93 +90,35 @@ brctl addbr br-bk
 brctl addif br-md mdveth0
 brctl addif br-bk bkveth0
 
-# Create a linux-bridge for the vtep
-brctl addbr br-vxlan
+# Create a point-to-point VXLAN interface for each company:
+ip link add vxlan-10 type vxlan id 10 remote 10.0.2.9 dev eth1
+ip link add vxlan-20 type vxlan id 20 remote 10.0.2.9 dev eth1
 
-# Create a point-to-point VXLAN interface for each company
-ip link add vxlan-10 type vxlan id 10 remote 192.168.56.57 dev br-vxlan
-ip link add vxlan-20 type vxlan id 20 remote 192.168.56.57 dev br-vxlan
+# Use the -d flag with ip link to show the VTEP (eth1) linked to the VXLAN interface
+ip -d link show vxlan-10
+ip -d link show vxlan-20
 
-# Add the point-to-point VXLAN interface to each company's tenant-network linux-bridge 
+# Add the point-to-point VXLAN interface to each company's tenant-network linux-		bridge:
 brctl addif br-md vxlan-10
 brctl addif br-bk vxlan-20
 
-# Assign an ip address to the VXLAN bridge
-ip addr add 172.29.236.1/255.255.252.0 dev br-vxlan
-
-# Add eth1 to the br-vxlan bridge
-brctl addif br-vxlan eth1
-
-# Bring up the veth pair
+# Bring up the veth pairs:
 ip link set dev mdveth0 up
 ip link set dev bkveth0 up
+ip netns exec mcdonalds ip link set dev mdveth1 up
+ip netns exec burgerking ip link set dev bkveth1 up
 
-# Bring up each company's tenant-network bridge
+# Bring up the loopback adapter inside the namespaces:
+ip netns exec mcdonalds ip link set dev lo up
+ip netns exec burgerking ip link set dev lo up
+
+# Bring up each company's tenant-network bridge:
 ip link set dev br-md up
 ip link set dev br-bk up
 
-# Bring up the VXLAN interface for each company
+# Bring up the VXLAN interface for each company:
 ip link set dev vxlan-10 up
 ip link set dev vxlan-20 up
 
-# Bring up the VXLAN bridge
-ip link set dev br-vxlan up
-
-
-# On node2
-
-# Create network namepsace for both companies
-ip netns add mcdonalds
-ip netns add burgerking
-
-# Create veth pair for both companies
-ip link add mdveth0 type veth peer name mdveth1
-ip link add bkveth0 type veth peer name bkveth1
-
-# Add veth1 to each company's namespace
-ip link set mdveth1 netns mcdonalds
-ip link set bkveth1 netns burgerking
-
-# Add same ip to veth1 in both company's namespace
-ip netns exec mcdonalds ifconfig mdveth1 10.0.0.6/24 up
-ip netns exec burgerking ifconfig bkveth1 10.0.0.6/24 up
-
-# Create a tenant-network linux-bridge for each company
-brctl addbr br-md
-brctl addbr br-bk
-
-# Add veth pair to each company's linux-bridge
-brctl addif br-md mdveth0
-brctl addif br-bk bkveth0
-
-# Create a linux-bridge for the vtep
-brctl addbr br-vxlan
-
-# Create a point-to-point VXLAN interface for each company
-ip link add vxlan-10 type vxlan id 10 remote 192.168.56.56 dev br-vxlan
-ip link add vxlan-20 type vxlan id 20 remote 192.168.56.56 dev br-vxlan
-
-# Add the point-to-point VXLAN interface to each company's tenant-network linux-bridge
-brctl addif br-md vxlan-10
-brctl addif br-bk vxlan-20
-
-# Assign an ip address to the VXLAN bridge
-ip addr add 172.29.236.2/255.255.252.0 dev br-vxlan
-
-# Add eth1 to the br-vxlan bridge
-brctl addif br-vxlan eth1
-
-# Bring up the veth pair
-ip link set dev mdveth0 up
-ip link set dev bkveth0 up
-
-# Bring up each company's tenant-network bridge
-ip link set dev br-md up
-ip link set dev br-bk up
-
-# Bring up the VXLAN interface for each company
-ip link set dev vxlan-10 up
-ip link set dev vxlan-20 up
-
-# Bring up the VXLAN bridge
-ip link set dev br-vxlan up
+# From the mcdonalds namespace, ping the 10.1.0.5 interface on the other node.  		
+# You should receive a reply.
