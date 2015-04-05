@@ -6,8 +6,7 @@ This method will only support two nodes
 2 nodes required
 ****************************************************************************************************************
 
-Node1
-******
+# On node1
 
 # Create a network namespace for both companies
 ip netns add mcdonalds
@@ -63,8 +62,7 @@ ip link set dev br-bk up
 ip link set dev vxlan-10 up
 ip link set dev vxlan-20 up
 
-Node2
-******
+# On node2
 
 # Create network namespace for both companies:
 ip netns add mcdonalds
