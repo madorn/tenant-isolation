@@ -32,22 +32,13 @@ brctl addbr br-bk
 brctl addif br-md mdveth0
 brctl addif br-bk bkveth0
 
-# Create a linux-bridge for the vtep
-brctl addbr br-vxlan
-
 # Create VXLAN interface for each company that subscribes to all-hosts multicast group
-ip link add vxlan-10 type vxlan id 10 dev br-vxlan group 224.0.0.1
-ip link add vxlan-20 type vxlan id 20 dev br-vxlan group  224.0.0.1
+ip link add vxlan-10 type vxlan id 10 dev eth1 group 224.0.0.1
+ip link add vxlan-20 type vxlan id 20 dev eth1 group  224.0.0.1
 
 # Add the point-to-point VXLAN interface to each company's tenant-network linux-bridge 
 brctl addif br-md vxlan-10
 brctl addif br-bk vxlan-20
-
-# Assign an ip address to the VXLAN bridge
-ip addr add 172.29.236.1/255.255.252.0 dev br-vxlan
-
-# Add eth1 to the br-vxlan bridge
-brctl addif br-vxlan eth1
 
 # Bring up the veth pair
 ip link set dev mdveth0 up
@@ -61,13 +52,9 @@ ip link set dev br-bk up
 ip link set dev vxlan-10 up
 ip link set dev vxlan-20 up
 
-# Bring up the VXLAN bridge
-ip link set dev br-vxlan up
-
-
 # On node2
 
-# Create network namepsace for both companies
+# Create network namespace for both companies
 ip netns add mcdonalds
 ip netns add burgerking
 
@@ -91,22 +78,13 @@ brctl addbr br-bk
 brctl addif br-md mdveth0
 brctl addif br-bk bkveth0
 
-# Create a linux-bridge for the vtep
-brctl addbr br-vxlan
-
 # Create VXLAN interface for each company that subscribes to all-hosts multicast group
-ip link add vxlan-10 type vxlan id 10 dev br-vxlan group 224.0.0.1
-ip link add vxlan-20 type vxlan id 20 dev br-vxlan group 224.0.0.1
+ip link add vxlan-10 type vxlan id 10 dev eth1 group 224.0.0.1
+ip link add vxlan-20 type vxlan id 20 dev eth1 group 224.0.0.1
 
 # Add the point-to-point VXLAN interface to each company's tenant-network linux-bridge
 brctl addif br-md vxlan-10
 brctl addif br-bk vxlan-20
-
-# Assign an ip address to the VXLAN bridge
-ip addr add 172.29.236.2/255.255.252.0 dev br-vxlan
-
-# Add eth1 to the br-vxlan bridge
-brctl addif br-vxlan eth1
 
 # Bring up the veth pair
 ip link set dev mdveth0 up
@@ -119,9 +97,6 @@ ip link set dev br-bk up
 # Bring up the VXLAN interface for each company
 ip link set dev vxlan-10 up
 ip link set dev vxlan-20 up
-
-# Bring up the VXLAN bridge
-ip link set dev br-vxlan up
 
 # On node3
 
@@ -149,22 +124,13 @@ brctl addbr br-bk
 brctl addif br-md mdveth0
 brctl addif br-bk bkveth0
 
-# Create a linux-bridge for the vtep
-brctl addbr br-vxlan
-
 # Create VXLAN interface for each company that subscribes to all-hosts multicast group
-ip link add vxlan-10 type vxlan id 10 dev br-vxlan group 224.0.0.1
-ip link add vxlan-20 type vxlan id 20 dev br-vxlan group 224.0.0.1
+ip link add vxlan-10 type vxlan id 10 dev eth1 group 224.0.0.1
+ip link add vxlan-20 type vxlan id 20 dev eth1 group 224.0.0.1
 
 # Add the point-to-point VXLAN interface to each company's tenant-network linux-bridge
 brctl addif br-md vxlan-10
 brctl addif br-bk vxlan-20
-
-# Assign an ip address to the VXLAN bridge
-ip addr add 172.29.236.3/255.255.252.0 dev br-vxlan
-
-# Add eth1 to the br-vxlan bridge
-brctl addif br-vxlan eth1
 
 # Bring up the veth pair
 ip link set dev mdveth0 up
@@ -177,6 +143,3 @@ ip link set dev br-bk up
 # Bring up the VXLAN interface for each company
 ip link set dev vxlan-10 up
 ip link set dev vxlan-20 up
-
-# Bring up the VXLAN bridge
-ip link set dev br-vxlan up
