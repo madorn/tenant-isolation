@@ -17,11 +17,16 @@ a test wow a
 ssss LOL
 
 oh yeah
+<<<<<<< HEAD
 ddd
 a joke
 changes i made latest
 
 from my machine
+=======
+
+a joke    
+>>>>>>> 2203edf... added 'a joke'
 [iproute2 cheatsheet]:http://baturin.org/docs/iproute2/
 [ietf vlan doc]:http://tools.ietf.org/html/rfc5517
 [ietf vxlan doc]:http://tools.ietf.org/html/draft-mahalingam-dutt-dcops-vxlan-00
