@@ -20,6 +20,8 @@ oh yeah
 ddd
 a joke
 changes i made latest
+
+from my machine
 [iproute2 cheatsheet]:http://baturin.org/docs/iproute2/
 [ietf vlan doc]:http://tools.ietf.org/html/rfc5517
 [ietf vxlan doc]:http://tools.ietf.org/html/draft-mahalingam-dutt-dcops-vxlan-00
