@@ -1,4 +1,4 @@
-Tenant-Isolation Exercises
+sTenant-Isolation Exercises
 ===============================================  
 ----
 These exercises are intended to provide clarification on the various methods one can utilize to perform tenant-network isolation inside infrastructure-as-a-service platforms like OpenStack.
