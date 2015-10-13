@@ -1,4 +1,4 @@
-sTenant-Isolation Exercises
+Tenant-Isolation Exercises
 ===============================================  
 ----
 These exercises are intended to provide clarification on the various methods one can utilize to perform tenant-network isolation inside infrastructure-as-a-service platforms like OpenStack.
@@ -12,23 +12,6 @@ Requirements
 
 Resources: [iproute2 cheatsheet] & [ietf vlan doc] & [ietf vxlan doc] 
 
-a test wow a
-
-ssss LOL
-
-oh yeah
-<<<<<<< HEAD
-ddd
-a joke
-changes i made latest
-
-from my machine
-=======
-
-a joke    
->>>>>>> 2203edf... added 'a joke'
 [iproute2 cheatsheet]:http://baturin.org/docs/iproute2/
 [ietf vlan doc]:http://tools.ietf.org/html/rfc5517
 [ietf vxlan doc]:http://tools.ietf.org/html/draft-mahalingam-dutt-dcops-vxlan-00
-
-did it from the web
